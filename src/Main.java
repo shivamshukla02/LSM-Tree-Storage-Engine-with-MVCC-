@@ -5,4 +5,3 @@ public class Main {
         wal.append("name", "shivam");
         wal.append("project", "LSMEngine");
         System.out.println("WAL write done");}}
-
