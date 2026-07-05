@@ -5,5 +5,7 @@ public class Main {
         MemTable memTable = new MemTable(wal);
         memTable.put("name", "shivam");
         memTable.put("project", "LSMEngine");
-        System.out.println(memTable.get("name"));
-        System.out.println(memTable.get("project"));}}
+        memTable.put("college", "PSIT");
+
+        SSTable.flush(memTable.getTable(), "sstable_1.sst");
+        System.out.println("flushed to disk");}}

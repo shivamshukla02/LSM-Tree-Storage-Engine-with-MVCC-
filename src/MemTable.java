@@ -19,5 +19,8 @@ public class MemTable{
     public String get(String key){
         return table.get(key);
     }
+    public ConcurrentSkipListMap<String, String> getTable() {
+        return table;
+    }
 }
 
