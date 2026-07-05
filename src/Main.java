@@ -1,10 +1,8 @@
-import java.net.StandardSocketOptions;
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
+import java.io.IOException;
 public class Main {
-    public static void main(String arg[]){
-MemTable memTable = new MemTable();
-memTable.put("name", "shivam");
-memTable.put("Project","LSM Engine");
-System.out.println(memTable.get("name"));
-System.out.println(memTable.get("Project"));}}
+    public static void main(String[] args) throws IOException {
+        WriteAheadLog wal = new WriteAheadLog ("wal.log");
+        wal.append("name", "shivam");
+        wal.append("project", "LSMEngine");
+        System.out.println("WAL write done");}}
+
