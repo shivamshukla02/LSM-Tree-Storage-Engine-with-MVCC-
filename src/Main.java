@@ -3,18 +3,10 @@ import java.util.List;
 
 public class Main {
     public static void main(String[] args) throws IOException {
-        WriteAheadLog wal = new WriteAheadLog("wal.log");
-        MemTable memTable = new MemTable(wal);
+        Bloomfilter bloom = new Bloomfilter(100);
+        bloom.add("name");
+        bloom.add("college");
 
-        memTable.put("name", "shivam");
-        memTable.put("college", "PSIT");
-        SSTable.flush(memTable.getTable(), "sstable_1.sst");
-
-        MemTable memTable2 = new MemTable(wal);
-        memTable2.put("name", "shivam_updated");
-        memTable2.put("project", "LSMEngine");
-        SSTable.flush(memTable2.getTable(), "sstable_2.sst");
-
-        List<String> files = List.of("sstable_1.sst", "sstable_2.sst");
-        Compaction.compact(files, "sstable_compacted.sst");
-        System.out.println("compaction done");}}
+        System.out.println(bloom.mightContain("name"));
+        System.out.println(bloom.mightContain("college"));
+        System.out.println(bloom.mightContain("randomkey"));}}
