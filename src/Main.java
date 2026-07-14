@@ -3,14 +3,14 @@ import java.util.List;
 
 public class Main {
     public static void main(String[] args) throws IOException {
-        LRUCache cache = new LRUCache(3);
-        cache.put("name", "shivam");
-        cache.put("college", "PSIT");
-        cache.put("project", "LSMEngine");
+        WriteAheadLog wal = new WriteAheadLog("wal.log");
+        LRUCache cache = new LRUCache(10);
+        MemTable memTable = new MemTable(wal, cache);
 
-        System.out.println(cache.get("name"));
+        memTable.put("name", "shivam");
+        memTable.put("college", "PSIT");
+        memTable.put("project", "LSMEngine");
 
-        cache.put("city", "kanpur");
-
-        System.out.println(cache.get("college"));
-        System.out.println(cache.get("name"));}}
+        System.out.println(memTable.get("name"));
+        System.out.println(memTable.get("college"));
+        System.out.println(memTable.get("randomkey"));}}
