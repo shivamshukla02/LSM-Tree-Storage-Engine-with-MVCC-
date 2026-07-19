@@ -13,4 +13,18 @@ public class SSTable {
         writer.flush();
         writer.close();
     }
+
+    public static String read(String filepath, String searchkey) throws IOException{
+        BufferedReader reader = new BufferedReader(new FileReader(filepath));
+        String line;
+        while((line = reader.readLine())!= null){
+            String[] parts =line.split(",");
+            if(parts[0].equals(searchkey)){
+                reader.close();
+                return parts[1];
+            }
+        }
+        reader.close();
+        return null;
+    }
 }

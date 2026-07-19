@@ -9,8 +9,17 @@ public class Main {
 
         memTable.put("name", "shivam");
         memTable.put("college", "PSIT");
-        memTable.put("project", "LSMEngine");
+        SSTable.flush(memTable.getTable(), "sstable_1.sst");
 
-        System.out.println(memTable.get("name"));
-        System.out.println(memTable.get("college"));
-        System.out.println(memTable.get("randomkey"));}}
+        Bloomfilter bloom = new Bloomfilter(100);
+        bloom.add("name");
+        bloom.add("college");
+
+        String searchKey = "college";
+
+        if (bloom.mightContain(searchKey)) {
+            String result = SSTable.read("sstable_1.sst", searchKey);
+            System.out.println("found: " + result);
+        } else {
+            System.out.println("bloom filter skipped this SSTable");
+        }}}
