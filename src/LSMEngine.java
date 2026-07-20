@@ -33,6 +33,7 @@ public class LSMEngine {
         SSTable.flush(memTable.getTable(), fileName);
         sstableFiles.add(fileName);
         memTable = new MemTable(wal, cache);
+        if (sstableFiles.size() >= 3) compact();
         System.out.println("flushed to " + fileName);
     }
 
@@ -50,5 +51,16 @@ public class LSMEngine {
             if (result != null) return result;
         }
         return null;
+    }
+    public void compact() throws IOException {
+        if (sstableFiles.size() < 2) {
+            System.out.println("nothing to compact");
+            return;
+        }
+        String outputFile = "sstable_compacted_" + sstableCount++ + ".sst";
+        Compaction.compact(sstableFiles, outputFile);
+        sstableFiles.clear();
+        sstableFiles.add(outputFile);
+        System.out.println("compacted into " + outputFile);
     }
 }
