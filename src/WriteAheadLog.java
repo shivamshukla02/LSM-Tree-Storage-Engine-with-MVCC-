@@ -30,5 +30,9 @@ public void append(String key, String value) throws IOException{
         reader.close();
         return entries;
     }
+    public void clear() throws IOException {
+        writer.close();
+        writer = new BufferedWriter(new FileWriter("wal.log", false));
+    }
 
 }

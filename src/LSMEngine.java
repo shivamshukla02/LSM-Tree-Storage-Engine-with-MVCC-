@@ -33,6 +33,7 @@ public class LSMEngine {
         SSTable.flush(memTable.getTable(), fileName);
         sstableFiles.add(fileName);
         memTable = new MemTable(wal, cache);
+        wal.clear();
         if (sstableFiles.size() >= 3) compact();
         System.out.println("flushed to " + fileName);
     }
