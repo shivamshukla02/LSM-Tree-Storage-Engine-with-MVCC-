@@ -63,4 +63,13 @@ public class LSMEngine {
         sstableFiles.add(outputFile);
         System.out.println("compacted into " + outputFile);
     }
+    public void replayWAL() throws IOException {
+        List<String[]> entries = wal.readAll();
+        for (String[] entry : entries) {
+            memTable.getTable().put(entry[0], entry[1]);
+            bloom.add(entry[0]);
+            cache.put(entry[0], entry[1]);
+        }
+        System.out.println("replayed " + entries.size() + " entries from WAL");
+    }
 }

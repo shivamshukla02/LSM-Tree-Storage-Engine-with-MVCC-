@@ -1,6 +1,12 @@
 import java.io.BufferedWriter;
+import java.io.BufferedReader;
 import java.io.FileWriter;
+import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.io.File;
+import java.util.List;
 
 public class WriteAheadLog {
     private BufferedWriter writer;
@@ -10,4 +16,19 @@ public void append(String key, String value) throws IOException{
         writer.write(key+","+value);
         writer.newLine();
         writer.flush();}
+    public List<String[]> readAll() throws IOException {
+        List<String[]> entries = new ArrayList<>();
+        File file = new File(writer.toString());
+        BufferedReader reader = new BufferedReader(new FileReader("wal.log"));
+        String line;
+        while ((line = reader.readLine()) != null) {
+            String[] parts = line.split(",");
+            if (parts.length == 2) {
+                entries.add(parts);
+            }
+        }
+        reader.close();
+        return entries;
+    }
+
 }
