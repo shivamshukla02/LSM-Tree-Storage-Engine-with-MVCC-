@@ -20,7 +20,7 @@ public class LSMEngine {
         this.memTable = new MemTable(wal, cache);
     }
 
-    public void put(String key, String value) throws IOException {
+    public synchronized void put(String key, String value) throws IOException {
         memTable.put(key, value);
         bloom.add(key);
         if (memTable.getTable().size() >= MEMTABLE_LIMIT) {
