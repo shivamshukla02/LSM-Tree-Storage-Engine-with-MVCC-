@@ -13,7 +13,7 @@ public class LSMEngine {
 
     public LSMEngine() throws IOException {
         this.wal = new WriteAheadLog("wal.log");
-        this.cache = new LRUCache(100);
+        this.cache = new LRUCache(10000);
         this.bloom = new Bloomfilter(10000);
         this.sstableFiles = new ArrayList<>();
         this.sstableCount = 0;
@@ -35,7 +35,16 @@ public class LSMEngine {
         memTable = new MemTable(wal, cache);
         wal.flushWAL();
         wal.clear();
-        if (sstableFiles.size() >= 3) compact();
+        if (sstableFiles.size() >= 3) {
+            List<String> toCompact = new ArrayList<>(sstableFiles);
+            new Thread(() -> {
+                try {
+                    compact(toCompact);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }).start();
+        }
         System.out.println("flushed to " + fileName);
     }
 
@@ -54,17 +63,18 @@ public class LSMEngine {
         }
         return null;
     }
-    public void compact() throws IOException {
-        if (sstableFiles.size() < 2) {
-            System.out.println("nothing to compact");
-            return;
-        }
+
+    public void compact(List<String> filesToCompact) throws IOException {
+        if (filesToCompact.size() < 2) return;
         String outputFile = "sstable_compacted_" + sstableCount++ + ".sst";
-        Compaction.compact(sstableFiles, outputFile);
-        sstableFiles.clear();
-        sstableFiles.add(outputFile);
+        Compaction.compact(filesToCompact, outputFile);
+        synchronized (sstableFiles) {
+            sstableFiles.clear();
+            sstableFiles.add(outputFile);
+        }
         System.out.println("compacted into " + outputFile);
     }
+
     public void replayWAL() throws IOException {
         List<String[]> entries = wal.readAll();
         for (String[] entry : entries) {

@@ -4,27 +4,37 @@ import java.util.concurrent.ConcurrentSkipListMap;
 
 public class SSTable {
 
-    public static void flush(ConcurrentSkipListMap<String,String>table, String filepath) throws IOException {
-        BufferedWriter writer = new BufferedWriter(new FileWriter(filepath));
+    public static void flush(ConcurrentSkipListMap<String, String> table, String filePath) throws IOException {
+        DataOutputStream out = new DataOutputStream(
+                new BufferedOutputStream(new FileOutputStream(filePath)));
         for (Map.Entry<String, String> entry : table.entrySet()) {
-            writer.write(entry.getKey() + "," + entry.getValue());
-            writer.newLine();
+            byte[] keyBytes = entry.getKey().getBytes();
+            byte[] valBytes = entry.getValue().getBytes();
+            out.writeInt(keyBytes.length);
+            out.write(keyBytes);
+            out.writeInt(valBytes.length);
+            out.write(valBytes);
         }
-        writer.flush();
-        writer.close();
+        out.flush();
+        out.close();
     }
 
-    public static String read(String filepath, String searchkey) throws IOException{
-        BufferedReader reader = new BufferedReader(new FileReader(filepath));
-        String line;
-        while((line = reader.readLine())!= null){
-            String[] parts =line.split(",");
-            if(parts[0].equals(searchkey)){
-                reader.close();
-                return parts[1];
+    public static String read(String filePath, String searchKey) throws IOException {
+        DataInputStream in = new DataInputStream(
+                new BufferedInputStream(new FileInputStream(filePath)));
+        while (in.available() > 0) {
+            int keyLen = in.readInt();
+            byte[] keyBytes = new byte[keyLen];
+            in.readFully(keyBytes);
+            int valLen = in.readInt();
+            byte[] valBytes = new byte[valLen];
+            in.readFully(valBytes);
+            if (new String(keyBytes).equals(searchKey)) {
+                in.close();
+                return new String(valBytes);
             }
         }
-        reader.close();
+        in.close();
         return null;
     }
 }
