@@ -12,10 +12,14 @@ public class WriteAheadLog {
     private BufferedWriter writer;
     public WriteAheadLog(String filepath ) throws IOException{
         this.writer= new BufferedWriter(new FileWriter(filepath,true));}
-public void append(String key, String value) throws IOException{
-        writer.write(key+","+value);
+    public void append(String key, String value) throws IOException {
+        writer.write(key + "," + value);
         writer.newLine();
-        writer.flush();}
+    }
+
+    public void flushWAL() throws IOException {
+        writer.flush();
+    }
     public List<String[]> readAll() throws IOException {
         List<String[]> entries = new ArrayList<>();
         File file = new File(writer.toString());

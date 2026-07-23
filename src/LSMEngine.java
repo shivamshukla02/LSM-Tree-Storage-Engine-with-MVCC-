@@ -9,7 +9,7 @@ public class LSMEngine {
     private final Bloomfilter bloom;
     private final List<String> sstableFiles;
     private int sstableCount;
-    private static final int MEMTABLE_LIMIT = 3;
+    private static final int MEMTABLE_LIMIT = 1000;
 
     public LSMEngine() throws IOException {
         this.wal = new WriteAheadLog("wal.log");
@@ -33,6 +33,7 @@ public class LSMEngine {
         SSTable.flush(memTable.getTable(), fileName);
         sstableFiles.add(fileName);
         memTable = new MemTable(wal, cache);
+        wal.flushWAL();
         wal.clear();
         if (sstableFiles.size() >= 3) compact();
         System.out.println("flushed to " + fileName);
