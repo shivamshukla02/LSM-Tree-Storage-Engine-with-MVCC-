@@ -14,7 +14,7 @@ public class LSMEngine {
     public LSMEngine() throws IOException {
         this.wal = new WriteAheadLog("wal.log");
         this.cache = new LRUCache(10000);
-        this.bloom = new Bloomfilter(10000);
+        this.bloom = new Bloomfilter(10000, 10);
         this.sstableFiles = new ArrayList<>();
         this.sstableCount = 0;
         this.memTable = new MemTable(wal, cache);
