@@ -372,13 +372,6 @@ engine.measureSpaceAmplification();
 | MVCC with Lamport clocks | Works across machines, no clock drift | More memory per key (multiple versions) |
 | BloomFilter 10 bits/key | Eliminates 90%+ unnecessary reads | ~1% false positive rate |
 
----
-
-## Interview Explanation (2 min)
-
-> "I built an LSM-Tree storage engine from scratch in Java. The write path goes: WAL first for crash safety, then MemTable (in-memory ConcurrentSkipListMap), and when MemTable fills up it flushes to a binary SSTable on disk. The read path checks LRU cache first, then MemTable, then uses BloomFilter to skip SSTables that definitely don't have the key — this eliminates over 90% of unnecessary disk reads. Background compaction merges SSTables and resolves duplicate keys with latest-write-wins. I added MVCC with Lamport timestamps so readers always see a consistent snapshot even while writes are happening. Benchmarked at 117K writes/sec with p99 latency of 178µs on my laptop using 8 concurrent threads."
-
----
 
 ## Future Improvements
 
