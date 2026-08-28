@@ -1,6 +1,6 @@
 # LSM-Tree Storage Engine with MVCC
 
-> A high-performance, production-inspired Log-Structured Merge Tree (LSM) storage engine built from scratch in Java 17 — featuring Write-Ahead Logging, Bloom Filters, Sharded LRU Cache, Adaptive Compaction, and Multi-Version Concurrency Control (MVCC).
+> A high-performance, production-inspired Log-Structured Merge Tree (LSM) storage engine built from scratch in Java 24 — featuring Write-Ahead Logging, Bloom Filters, Sharded LRU Cache, Adaptive Compaction, and Multi-Version Concurrency Control (MVCC).
 
 ---
 
