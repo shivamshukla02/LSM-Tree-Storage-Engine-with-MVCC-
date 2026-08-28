@@ -16,6 +16,43 @@ Read Path: Client → LRU Cache → MemTable → BloomFilter → SSTable
 Compaction: Background thread merges SSTables, resolves duplicate keys
 MVCC: Lamport timestamps enable snapshot isolation for concurrent reads
 
+## Architecture Diagram
+
+```mermaid
+flowchart TD
+    Client([Client])
+    
+    subgraph Write Path
+        WAL[WriteAheadLog\nAppend-only disk log]
+        MEM[MemTable\nConcurrentSkipListMap]
+        SST[SSTable\nBinary sorted file]
+    end
+    
+    subgraph Read Path
+        LRU[ShardedLRU Cache\n8 shards]
+        BF[BloomFilter\n10 bits/key]
+    end
+    
+    subgraph Background
+        COMP[Compaction\nAdaptive throttled merge]
+        MVCC[MVCCStore\nLamport timestamps]
+    end
+
+    Client -->|put| WAL
+    WAL --> MEM
+    MEM -->|flush when full| SST
+    SST --> COMP
+    COMP -->|merged SSTable| SST
+
+    Client -->|get| LRU
+    LRU -->|miss| MEM
+    MEM -->|miss| BF
+    BF -->|mightContain| SST
+    BF -->|false = skip| Client
+
+    MEM --> MVCC
+    MVCC -->|snapshot read| Client
+```
 
 ## Components
 
