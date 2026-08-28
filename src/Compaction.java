@@ -4,6 +4,10 @@ import java.util.*;
 public class Compaction {
 
     public static void compact(List<String> inputFiles, String outputFile) throws IOException {
+        compact(inputFiles, outputFile, 0);
+    }
+
+    public static void compact(List<String> inputFiles, String outputFile, long throttleMs) throws IOException {
         TreeMap<String, String> merged = new TreeMap<>();
 
         for (String filePath : inputFiles) {
@@ -17,6 +21,9 @@ public class Compaction {
                 byte[] valBytes = new byte[valLen];
                 in.readFully(valBytes);
                 merged.put(new String(keyBytes), new String(valBytes));
+                if (throttleMs > 0) {
+                    try { Thread.sleep(throttleMs); } catch (InterruptedException e) { Thread.currentThread().interrupt(); }
+                }
             }
             in.close();
         }

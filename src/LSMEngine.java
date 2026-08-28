@@ -10,6 +10,7 @@ public class LSMEngine {
     private final List<String> sstableFiles;
     private int sstableCount;
     private static final int MEMTABLE_LIMIT = 1000;
+    private volatile long lastFlushTime = System.currentTimeMillis();
 
     public LSMEngine() throws IOException {
         this.wal = new WriteAheadLog("wal.log");
@@ -39,12 +40,22 @@ public class LSMEngine {
             List<String> toCompact = new ArrayList<>(sstableFiles);
             new Thread(() -> {
                 try {
-                    compact(toCompact);
+                    long timeSinceLastFlush = System.currentTimeMillis() - lastFlushTime;
+                    long throttleMs;
+                    if (timeSinceLastFlush < 100) {
+                        throttleMs = 0;
+                    } else if (timeSinceLastFlush < 500) {
+                        throttleMs = 1;
+                    } else {
+                        throttleMs = 5;
+                    }
+                    compact(toCompact, throttleMs);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }).start();
         }
+        lastFlushTime = System.currentTimeMillis();
         System.out.println("flushed to " + fileName);
     }
 
@@ -64,10 +75,10 @@ public class LSMEngine {
         return null;
     }
 
-    public void compact(List<String> filesToCompact) throws IOException {
+    public void compact(List<String> filesToCompact, long throttleMs) throws IOException {
         if (filesToCompact.size() < 2) return;
         String outputFile = "sstable_compacted_" + sstableCount++ + ".sst";
-        Compaction.compact(filesToCompact, outputFile);
+        Compaction.compact(filesToCompact, outputFile, throttleMs);
         synchronized (sstableFiles) {
             sstableFiles.clear();
             sstableFiles.add(outputFile);
