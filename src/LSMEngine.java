@@ -5,7 +5,7 @@ import java.util.List;
 public class LSMEngine {
     private MemTable memTable;
     private final WriteAheadLog wal;
-    private final LRUCache cache;
+    private final ShardedLRUCache cache;
     private final Bloomfilter bloom;
     private final List<String> sstableFiles;
     private int sstableCount;
@@ -13,7 +13,7 @@ public class LSMEngine {
 
     public LSMEngine() throws IOException {
         this.wal = new WriteAheadLog("wal.log");
-        this.cache = new LRUCache(10000);
+        this.cache = new ShardedLRUCache(10000, 8);
         this.bloom = new Bloomfilter(10000, 10);
         this.sstableFiles = new ArrayList<>();
         this.sstableCount = 0;

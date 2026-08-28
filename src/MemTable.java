@@ -4,9 +4,9 @@ import java.util.concurrent.ConcurrentSkipListMap;
 public class MemTable {
     private final ConcurrentSkipListMap<String, String> table;
     private final WriteAheadLog wal;
-    private final LRUCache cache;
+    private final ShardedLRUCache cache;
 
-    public MemTable(WriteAheadLog wal, LRUCache cache) {
+    public MemTable(WriteAheadLog wal, ShardedLRUCache cache) {
         this.table = new ConcurrentSkipListMap<>();
         this.wal = wal;
         this.cache = cache;
@@ -28,4 +28,3 @@ public class MemTable {
         return table;
     }
 }
-
