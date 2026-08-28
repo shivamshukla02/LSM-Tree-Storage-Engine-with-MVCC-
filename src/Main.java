@@ -4,11 +4,17 @@ public class Main {
     public static void main(String[] args) throws IOException, InterruptedException {
         LSMEngine engine = new LSMEngine();
 
-        engine.put("name", "shivam");
-        long snapshot = engine.currentSnapshot();
-        engine.put("name", "shivam_updated");
+        for (int i = 0; i < 3000; i++) {
+            engine.put("key" + i, "value" + i);
+        }
 
-        System.out.println(engine.getSnapshot("name", snapshot));
-        System.out.println(engine.getSnapshot("name", engine.currentSnapshot()));
+        engine.measureSpaceAmplification();
+
+        for (int i = 0; i < 2000; i++) {
+            engine.put("key" + i, "value_updated_" + i);
+        }
+
+        Thread.sleep(2000);
+        engine.measureSpaceAmplification();
     }
 }

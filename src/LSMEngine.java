@@ -98,6 +98,26 @@ public class LSMEngine {
         System.out.println("compacted into " + outputFile);
     }
 
+    public double measureSpaceAmplification() {
+        long totalSize = 0;
+        long compactedSize = 0;
+
+        for (String file : sstableFiles) {
+            java.io.File f = new java.io.File(file);
+            totalSize += f.length();
+            if (file.contains("compacted")) {
+                compactedSize = f.length();
+            }
+        }
+
+        if (compactedSize == 0) return 1.0;
+        double amp = (double) totalSize / compactedSize;
+        System.out.printf("total SSTable size: %d bytes%n", totalSize);
+        System.out.printf("compacted size: %d bytes%n", compactedSize);
+        System.out.printf("space amplification: %.2fx%n", amp);
+        return amp;
+    }
+
     public void replayWAL() throws IOException {
         List<String[]> entries = wal.readAll();
         for (String[] entry : entries) {
